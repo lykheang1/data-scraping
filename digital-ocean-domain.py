@@ -43,7 +43,7 @@ html = '''
 # Parse the HTML using BeautifulSoup
 soup = BeautifulSoup(html, 'html.parser')
 
-# Find the element that contains the hostname
+# Extract the text content of the element
 hostname = soup.select_one('.hostNames .click-to-copy-text').text
 
 
