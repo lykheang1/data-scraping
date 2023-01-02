@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 html = '''
 <div class="columns small-12">
@@ -43,28 +44,26 @@ html = '''
 # Parse the HTML using BeautifulSoup
 soup = BeautifulSoup(html, 'html.parser')
 
-# Extract the text content of the element
-hostname = soup.select_one('.hostNames .click-to-copy-text').text
+records = []
 
+# Find all the rows in the table
+rows = soup.select('.domain-record-table tbody tr')
 
-# Extract the text content of the element
-value = soup.select_one('.value .click-to-copy-text').text
-
-
-# Extract the text content of the element
-ttl  = soup.select_one('.ttl .click-to-copy-text').text
-
-# Print the hostname, value, and ttl
-print(f'Hostname: {hostname}')
-print(f'Value: {value}')
-print(f'TTL: {ttl}')
-
-
-import pandas as pd
-
+# Loop through the rows
+for row in rows:
+  # Extract the hostname, value, and ttl for each row
+  hostname = row.select_one('.hostNames .click-to-copy-text').text
+  value = row.select_one('.value .click-to-copy-text').text
+  ttl = row.select_one('.ttl .click-to-copy-text').text
+  
+  # Append the data to the list of records
+  records.append({'Hostname': hostname, 'Value': value, 'TTL': ttl})
+  
 # Create a dataframe with the scraped data
-df = pd.DataFrame({'Hostname': [hostname],'Value': [value], 'TTL': [ttl]})
+df = pd.DataFrame(records)
 
-# Write the dataframe to an Excel file
+
+# # Write the dataframe to an Excel file
 df.to_excel('D:\scraped_data.xlsx', index=False)
 existing_df = pd.read_excel('D:\scraped_data.xlsx')
+
